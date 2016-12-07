@@ -1,0 +1,109 @@
+program             : optStatementList
+
+optStatementList    : statementList
+                    | *empty*
+
+statementList       : statement
+                    | statement statementList
+
+statement           : expression0 SEMICOLON
+                    | expression0 ASSIGN expression0 SEMICOLON
+                    | varDef SEMICOLON
+                    | block
+                    | functionDef
+                    | ifDef
+                    | forDef
+                    | whileDef
+                    | doWhileDef
+                    //| returnStatement
+
+expression0         : expression1 operator0 expression0
+                    | expression1
+
+operator0           : AND
+                    | OR
+
+expression1         : expression2 operator1 expression1
+                    | expression2
+
+operator1           : LT
+                    | GT
+                    | LTE
+                    | GTE
+                    | NOT_EQUALS
+                    | EQUALS
+
+expression2         : expression3 operator2 expression2
+                    | expression3
+
+operator2           : PLUS
+                    | MINUS
+
+expression3         : expression4 operator3 expression3
+                    | expression4
+
+operator3           : TIMES
+                    | DIVIDE
+                    | MOD
+
+expression4         : unary operator4 expression4
+                    | unary
+
+operator4           : DOT
+
+//returnStatement     : RETURN expr SEMICOLON
+
+unaryOperator       : NOT
+                    | INCREMENT
+                    | DECREMENT
+
+array               : OPENBRACKET argList CLOSEBRACKET
+
+unary               : INTEGER
+                    | TRUE
+                    | FALSE
+                    | STRING
+                    | IDENTIFIER
+                    | OPENPAREN expression0 CLOSEPAREN
+                    | lambda
+                    | array
+                    | unaryOperator unary
+                    | varexpr
+
+varexpr             : IDENTIFIER
+                    | IDENTIFIER OPENPAREN optArgList CLOSEPAREN
+                    | IDENTIFIER OPENBRACKET expr CLOSEBRACKET
+                    | lambda OPENPAREN optArgList CLOSEPAREN
+
+optParamList        : paramList
+                    | *empty*
+
+paramList           : IDENTIFIER
+                    | IDENTIFIER COMMA paramList
+
+optArgList          : argList
+                    | *empty*
+
+argList             : unary COMMA argList
+                    | unary
+
+functionDef         : FUNCTION IDENTIFIER OPENPAREN optParamList CLOSEPAREN block
+
+varDef              : VAR IDENTIFIER EQUALS expression0
+                    | VAR IDENTIFIER
+
+block               : OPENCURLY optStatementList CLOSECURLY
+
+ifDef               : IF OPENPAREN expr CLOSEPAREN block optElseIf
+
+optElseIf           : ELSE ifDef
+                    | ELSE block
+                    | *empty*
+
+forDef              : FOR OPENPAREN varDef SEMICOLON expr SEMICOLON expr CLOSEPAREN block
+
+whileDef            : WHILE OPENPAREN expr CLOSEPAREN block
+
+doWhileDef          : DO block WHILE OPENPAREN expr CLOSEPAREN SEMICOLON
+
+lambda              : OPENPAREN optParamList CLOSEPAREN ARROW block
