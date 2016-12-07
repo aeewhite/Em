@@ -15,7 +15,6 @@ statement           : expression0 SEMICOLON
                     | forDef
                     | whileDef
                     | doWhileDef
-                    //| returnStatement
 
 expression0         : expression1 operator0 expression0
                     | expression1
@@ -51,8 +50,6 @@ expression4         : unary operator4 expression4
 
 operator4           : DOT
 
-//returnStatement     : RETURN expr SEMICOLON
-
 unaryOperator       : NOT
                     | INCREMENT
                     | DECREMENT
@@ -84,8 +81,8 @@ paramList           : IDENTIFIER
 optArgList          : argList
                     | *empty*
 
-argList             : unary COMMA argList
-                    | unary
+argList             : expression0 COMMA argList
+                    | expression0
 
 functionDef         : FUNCTION IDENTIFIER OPENPAREN optParamList CLOSEPAREN block
 
@@ -106,4 +103,4 @@ whileDef            : WHILE OPENPAREN expr CLOSEPAREN block
 
 doWhileDef          : DO block WHILE OPENPAREN expr CLOSEPAREN SEMICOLON
 
-lambda              : OPENPAREN optParamList CLOSEPAREN ARROW block
+lambda              : LAMBDA OPENPAREN optParamList CLOSEPAREN ARROW block
