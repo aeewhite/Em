@@ -59,9 +59,8 @@ public class Recognizer {
         }
         else{
             //Throw fatal error
-            Logger.langError(String.format("Expected %s but found %s",
+            throw new EmException(String.format("Expected %s but found %s",
                     type, current.getType()), current);
-            return null;
         }
     }
 

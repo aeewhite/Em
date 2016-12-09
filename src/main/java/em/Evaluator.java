@@ -1,9 +1,6 @@
 package em;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.function.BiFunction;
 
 import static em.Environment.*;
@@ -155,8 +152,7 @@ public class Evaluator {
             return evalExpression(pt, env);
         }
         else {
-            Logger.langError("No evaluator for type " + pt.getType(), pt);
-            return null;
+            throw new EmException("No evaluator for type " + pt.getType(), pt);
         }
     }
 
@@ -189,8 +185,7 @@ public class Evaluator {
                 (Lexeme arglist, Lexeme env) -> {
                     Lexeme size = arglist.getLeft();
                     if(size.getType() != LexemeType.INTEGER){
-                        Logger.langError("Cannot create array of size " + size.getValue(), size);
-                        return null;
+                        throw new EmException("Cannot create array of size " + size.getValue(), size);
                     }
                     else{
                         Lexeme[] arr = new Lexeme[(Integer)size.getValue()];
@@ -206,8 +201,7 @@ public class Evaluator {
                 (Lexeme arglist, Lexeme env) -> {
                     Lexeme arr = arglist.getLeft();
                     if(arr.getType() != LexemeType.ARRAY){
-                        Logger.langError("Cannot get size of non-array type " + arr.getType(), arr);
-                        return null;
+                        throw new EmException("Cannot get size of non-array type " + arr.getType(), arr);
                     }
                     else{
                         Lexeme[] val = (Lexeme[])arr.getValue();
@@ -306,9 +300,8 @@ public class Evaluator {
                     ((String)addend.getValue()).concat((String)augend.getValue()));
         }
         else{
-            Logger.langError("Wrong types for +: " + addend.getType() +
+            throw new EmException("Wrong types for +: " + addend.getType() +
                     " and " + augend.getType(), pt);
-            return null;
         }
     }
 
@@ -321,9 +314,8 @@ public class Evaluator {
                     (Integer)minuend.getValue() - (Integer)subtrahend.getValue());
         }
         else{
-            Logger.langError("Wrong types for -: "  + minuend.getType() +
+            throw new EmException("Wrong types for -: "  + minuend.getType() +
                     " and " + subtrahend.getType(), pt);
-            return null;
         }
     }
 
@@ -336,9 +328,8 @@ public class Evaluator {
                     (Integer)left.getValue() % (Integer)right.getValue());
         }
         else{
-            Logger.langError("Wrong types for %: "  + left.getType() +
+            throw new EmException("Wrong types for %: "  + left.getType() +
                     " and " + right.getType(), pt);
-            return null;
         }
     }
 
@@ -365,9 +356,8 @@ public class Evaluator {
                     (Integer)dividend.getValue() / (Integer)divisor.getValue());
         }
         else{
-            Logger.langError("Wrong types for /: "  + dividend.getType() +
+            throw new EmException("Wrong types for /: "  + dividend.getType() +
                     " and " + divisor.getType(), pt);
-            return null;
         }
     }
 
@@ -394,9 +384,8 @@ public class Evaluator {
             }
         }
         else{
-            Logger.langError("Wrong types for >: "  + left.getType() +
+            throw new EmException("Wrong types for >: "  + left.getType() +
                     " and " + right.getType(), pt);
-            return null;
         }
     }
 
@@ -423,9 +412,8 @@ public class Evaluator {
             }
         }
         else{
-            Logger.langError("Wrong types for <: "  + left.getType() +
+            throw new EmException("Wrong types for <: "  + left.getType() +
                     " and " + right.getType(), pt);
-            return null;
         }
     }
 
@@ -452,9 +440,8 @@ public class Evaluator {
             }
         }
         else{
-            Logger.langError("Wrong types for <=: "  + left.getType() +
+            throw new EmException("Wrong types for <=: "  + left.getType() +
                     " and " + right.getType(), pt);
-            return null;
         }
     }
 
@@ -481,9 +468,8 @@ public class Evaluator {
             }
         }
         else{
-            Logger.langError("Wrong types for >=: "  + left.getType() +
+            throw new EmException("Wrong types for >=: "  + left.getType() +
                     " and " + right.getType(), pt);
-            return null;
         }
     }
 
@@ -538,9 +524,8 @@ public class Evaluator {
             return new Lexeme(LexemeType.TRUE);
         }
         else{
-            Logger.langError("Cannot negate non-boolean type "
+            throw new EmException("Cannot negate non-boolean type "
                     + initial.getType(), initial);
-            return null;
         }
     }
 
@@ -559,14 +544,12 @@ public class Evaluator {
                     env);
         }
         else if(origValue.getType() != LexemeType.INTEGER){
-            Logger.langError("Cannot decrement non-integer type " +
+            throw new EmException("Cannot decrement non-integer type " +
                     initial.getLeft().getType(), initial.getLeft());
-            return null;
         }
         else{
-            Logger.langError("Cannot decrement value of non-IDENTIFIER type " +
+            throw new EmException("Cannot decrement value of non-IDENTIFIER type " +
                     initial.getLeft().getType(), initial.getLeft());
-            return null;
         }
     }
 
@@ -585,14 +568,12 @@ public class Evaluator {
                     env);
         }
         else if(origValue.getType() != LexemeType.INTEGER){
-            Logger.langError("Cannot increment value of non-IDENTIFIER type " +
+            throw new EmException("Cannot increment value of non-IDENTIFIER type " +
                     initial.getLeft().getType(), initial.getLeft());
-            return null;
         }
         else{
-            Logger.langError("Cannot increment value of non-IDENTIFIER type " +
+            throw new EmException("Cannot increment value of non-IDENTIFIER type " +
                     initial.getLeft().getType(), initial.getLeft());
-            return null;
         }
     }
 
@@ -685,14 +666,12 @@ public class Evaluator {
         Lexeme index = eval(pt.getRight(), env);
         Lexeme array = eval(pt.getLeft(), env);
         if(array.getType() != LexemeType.ARRAY){
-            Logger.langError("Attempt to index into non-array type " +
+            throw new EmException("Attempt to index into non-array type " +
                     array.getType(), array);
-            return null;
         }
         else if(index.getType() != LexemeType.INTEGER){
-            Logger.langError("Attempt to access array at non-integer index" +
-                index.getValue(), index);
-            return null;
+            throw new EmException("Attempt to access array at non-integer index" +
+                    index.getValue(), index);
         }
         else {
             //We have a valid array access
@@ -716,9 +695,8 @@ public class Evaluator {
             Lexeme arr = eval(var.getLeft().getLeft(), env);
             Lexeme index = eval(var.getLeft().getRight(), env);
             if(index.getType() != LexemeType.INTEGER){
-                Logger.langError("Cannot assign to non-integer index " +
-                    index.getValue(), index);
-                return null;
+                throw new EmException("Cannot assign to non-integer index " +
+                        index.getValue(), index);
             }
             else{
                 Object[] jarray = (Object[])arr.getValue();
@@ -729,10 +707,9 @@ public class Evaluator {
             }
         }
         else{
-            Logger.langError("Cannot assign " + val.getValue() + " to " +
+            throw new EmException("Cannot assign " + val.getValue() + " to " +
                     var.getValue() + ". " + var.getType()
                     + " is not an IDENTIFIER", var);
-            return null;
         }
     }
 
@@ -773,9 +750,8 @@ public class Evaluator {
         Lexeme left = eval(pt.getLeft(), env);
         if(left.getType() != LexemeType.TRUE &&
                 left.getType() != LexemeType.FALSE){
-            Logger.langError("Left side of AND did not evaluate to a boolean",
+            throw new EmException("Left side of AND did not evaluate to a boolean",
                     left);
-            return null;
         }
         if(left.getType() == LexemeType.FALSE){
             return new Lexeme(LexemeType.FALSE);
@@ -784,9 +760,8 @@ public class Evaluator {
 
         if(right.getType() != LexemeType.TRUE &&
                 right.getType() != LexemeType.FALSE){
-            Logger.langError("Right side of AND did not evaluate to a boolean",
+            throw new EmException("Right side of AND did not evaluate to a boolean",
                     right);
-            return null;
         }
         else if(left.getType() == LexemeType.TRUE
                 && eval(pt.getRight(), env).getType() == LexemeType.TRUE){
@@ -802,15 +777,13 @@ public class Evaluator {
         Lexeme right = eval(pt.getRight(), env);
         if(left.getType() != LexemeType.TRUE &&
                 left.getType() != LexemeType.FALSE){
-            Logger.langError("Left side of OR did not evaluate to a boolean",
+            throw new EmException("Left side of OR did not evaluate to a boolean",
                     left);
-            return null;
         }
         else if(right.getType() != LexemeType.TRUE &&
                 right.getType() != LexemeType.FALSE){
-            Logger.langError("Right side of OR did not evaluate to a boolean",
+            throw new EmException("Right side of OR did not evaluate to a boolean",
                     right);
-            return null;
 
         }
         else if(eval(pt.getLeft(), env).getType() == LexemeType.TRUE
@@ -825,11 +798,9 @@ public class Evaluator {
     private Lexeme evalDot(Lexeme pt, Lexeme env){
         Lexeme obj = eval(pt.getLeft(), env);
         if(obj.getType() != LexemeType.ENV){
-            Logger.langError(String.format(
+            throw new EmException(String.format(
                     "Cannot access member of non-object type %s (%d, %d)",
                     obj.getType(), pt.getLeft().getRow(), pt.getCol()), pt);
-            System.exit(1);
-            return null;
         }
         else{
             if(pt.getRight().getLeft().getType() == LexemeType.FUNCTION_CALL){
@@ -915,9 +886,8 @@ public class Evaluator {
             }
         }
         else{
-            Logger.langError("Attempt to call non-function type "
+            throw new EmException("Attempt to call non-function type "
                     + closure.getType(), pt.getLeft());
-            return null;
         }
     }
 }
