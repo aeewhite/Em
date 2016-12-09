@@ -39,63 +39,59 @@ install: dist
 	cp dist/emi /usr/local/bin
 
 # Assignment Targets
-dpl: jar
-	echo java -jar bin/dpl.jar \$$\* > dpl
-	chmod +x ./dpl
-
 error1:
 	cat tests/error1.em
 
 error1x:
-	./dpl tests/error1.em
+	dist/emi tests/error1.em
 
 error2:
 	cat tests/error2.em
 
 error2x:
-	./dpl tests/error2.em
+	dist/emi tests/error2.em
 
 error3:
 	cat tests/error3.em
 
 error3x:
-	./dpl tests/error3.em
+	dist/emi tests/error3.em
 
 arrays:
 	cat tests/arrays.em
 
 arraysx:
-	./dpl tests/arrays.em
+	dist/emi tests/arrays.em
 
 conditionals:
 	cat tests/conditionals.em
 
 conditionalsx:
-	./dpl tests/conditionals.em
+	dist/emi tests/conditionals.em
 
 recursion:
 	cat tests/recursion.em
 
 recursionx:
-	./dpl tests/recursion.em
+	dist/emi tests/recursion.em
 
 iteration:
 	cat tests/iteration.em
 
 iterationx:
-	./dpl tests/iteration.em
+	dist/emi tests/iteration.em
 
 functions:
 	cat tests/functions.em
 
 functionsx:
-	./dpl tests/functions.em
+	dist/emi tests/functions.em
 
 dictionary:
 	cat tests/dictionary.em
 
 dictionaryx:
-	./dpl tests/dictionary.em
+	dist/emi tests/dictionary.em
 
 problem:
 	cat tests/rpn.em
@@ -106,27 +102,27 @@ problem:
 
 problemx:
 	@echo "Input file 0"
-	cat tests/rpninput0.txt |  ./dpl tests/rpn.em
+	cat tests/rpninput0.txt |  dist/emi tests/rpn.em
 	@echo "Input file 1"
-	cat tests/rpninput1.txt |  ./dpl tests/rpn.em
+	cat tests/rpninput1.txt |  dist/emi tests/rpn.em
 	@echo "Input file 2"
-	cat tests/rpninput2.txt |  ./dpl tests/rpn.em
+	cat tests/rpninput2.txt |  dist/emi tests/rpn.em
 
 # Extra Rules for Special Features
 precedence:
 	cat tests/precedence.em
 
 precedencex:
-	./dpl tests/precedence.em
+	dist/emi tests/precedence.em
 
 objects:
 	cat tests/objects.em
 
 objectsx:
-	./dpl tests/objects.em
+	dist/emi tests/objects.em
 
 emoji:
 	cat tests/emoji.em
 
 emojix:
-	./dpl tests/emoji.em
+	dist/emi tests/emoji.em
