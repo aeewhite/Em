@@ -89,7 +89,11 @@ public class FileInput {
                 pushBackReader.unread(low);
                 pushBackReader.unread(high);
             }
-            col--;
+            if(codepoint == '\n'){
+                row--;
+            }else{
+                col--;
+            }
         } catch (IOException e){
             System.err.println("Error in reading file");
             e.printStackTrace();
