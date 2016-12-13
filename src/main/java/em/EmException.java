@@ -11,8 +11,12 @@ public class EmException extends RuntimeException {
         //Top line
         String errorLine;
         if(lexeme.getFile() != null){
+            String filename = lexeme.getFile().getName();
+            if(filename.matches("^mainlib.*\\.em$")){
+                filename = "mainlib.em";
+            }
             errorLine = String.format("ERROR in %s at (%d,%d)",
-                    lexeme.getFile().getName(),
+                    filename,
                     lexeme.getRow(),
                     lexeme.getCol());
             String fileline = readLineFromFile(lexeme.getFile(), lexeme.getRow());

@@ -1,5 +1,9 @@
 package em;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+
 /**
  * Created by andrew on 9/21/16.
  */
@@ -38,23 +42,57 @@ public class Runner {
             printHelp(1);
         }
         else{
+            //Load the main library
+            File mainlib;
+            try{
+                InputStream inputStream = Thread.currentThread().
+                        getContextClassLoader().
+                        getResourceAsStream("em/mainlib.em");
+                File tempFile = File.createTempFile("mainlib", ".em");
+                tempFile.deleteOnExit();
+                try(FileOutputStream out = new FileOutputStream(tempFile)){
+                    byte[] buffer = new byte[1024];
+                    while(inputStream.read(buffer) > -1){
+                        out.write(buffer);
+                    }
+                }
+                mainlib = tempFile;
+
+            }
+            catch (Exception e){
+                mainlib = null;
+                e.printStackTrace();
+                System.exit(1);
+            }
+
+            Lexer mainlibLexer = new Lexer(mainlib);
+
+
             //Start up the interpreter
             Logger.silly("Starting file read");
+
+            Logger.debug("Loading Main Library");
+
+            Recognizer mlRecognizer = new Recognizer(filename, mainlibLexer.getLexemes());
+            Lexeme mlPT = mlRecognizer.parse();
+            Evaluator evaluator = new Evaluator();
+            Lexeme env = Environment.createEnv();
+            evaluator.initBuiltIns(env);
+            evaluator.eval(mlPT, env);
+
             Logger.debug("Reading from " + filename);
 
             Lexer lexer = new Lexer(filename);
 
-            for(Lexeme l : lexer.getLexemes()){
-                Logger.debug(l);
+            if(Logger.getLogLevel() > 0){
+                for(Lexeme l : lexer.getLexemes()){
+                    Logger.debug(l);
+                }
             }
+
 
             Recognizer recognizer = new Recognizer(filename, lexer.getLexemes());
             Lexeme pt = recognizer.parse();
-
-            Evaluator evaluator = new Evaluator();
-            Lexeme env = Environment.createEnv();
-            evaluator.initBuiltIns(env);
-
             evaluator.eval(pt, env).getValue();
         }
     }

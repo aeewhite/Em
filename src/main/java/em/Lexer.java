@@ -51,7 +51,7 @@ public class Lexer {
         int in = input.read();
 
         // end of file, stop lexing
-        if(in == -1 || in == 65535){
+        if(in <= 0 || in == 65535){
             return false;
         }
 

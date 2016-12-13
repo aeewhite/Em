@@ -1,4 +1,4 @@
-all: dist dpl
+all: dist
 
 run: jar
 	@echo "Starting program...\n"
@@ -25,6 +25,8 @@ clean:
 	rm -rf dist
 
 compileSrcFiles: bin
+	mkdir -p bin/em
+	cp src/main/resources/mainlib.em bin/em/mainlib.em
 	javac -Xlint:unchecked -cp "lib/*:bin:." -g -d bin src/main/java/em/*.java
 
 compileTestFiles: compileSrcFiles
