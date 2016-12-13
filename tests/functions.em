@@ -1,5 +1,3 @@
-function println(s){print(s, "\n");}
-
 function apply(f, x){
     f(x);
 }

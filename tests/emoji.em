@@ -1,4 +1,3 @@
-function println(s){print(s, "\n");}
 //Em supports emoji in variable names and in String values
 
 var emoji = "😎";

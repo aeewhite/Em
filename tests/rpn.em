@@ -1,5 +1,3 @@
-function println(s){print(s, "\n"); s;}
-
 class Stack(){
     class LinkedListNode(value){
         var next;

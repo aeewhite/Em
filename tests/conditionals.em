@@ -1,4 +1,3 @@
-function println(s){print(s, "\n");}
 //Simple If statement
 if(3 < 5){
     //Simple Conditional

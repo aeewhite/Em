@@ -1,5 +1,3 @@
-function println(s){print(s, "\n");}
-
 for(var i = 1; i < 5; ++i){
     print(i, " ");
     println("in the for loop");

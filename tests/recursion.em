@@ -1,5 +1,3 @@
-function println(s){print(s, "\n");}
-
 function fib(x){
     if(x < 2){
         x;
@@ -9,5 +7,5 @@ function fib(x){
     }
 }
 
-print("Fib(35) = ");
-println(fib(35));
+print("Fib(30) = ");
+println(fib(30));

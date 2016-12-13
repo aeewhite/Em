@@ -1,5 +1,3 @@
-function println(s){print(s, "\n");}
-
 class Node(){
     var value;
     var key;

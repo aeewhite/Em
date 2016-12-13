@@ -1,5 +1,3 @@
-function println(s){print(s, "\n");}
-
 //Traditional Way of Defining "class"
 function book(book_title){
     var title = book_title;
