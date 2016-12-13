@@ -38,10 +38,6 @@ public class Lexer {
         return lexemes;
     }
 
-    private File getFile(){
-        return this.file;
-    }
-
     public boolean lex(){
         input.skipWhitespace();
 
@@ -332,7 +328,7 @@ public class Lexer {
                     int test = input.read();
                     sb.appendCodePoint(test);
                 }
-            }while(in != '"' && in < Character.MAX_VALUE);
+            }while(in != '"' && in != -1);
             lexemes.add(new Lexeme(LexemeType.STRING, sb.toString(), row, col, this.file));
             return true;
         }
