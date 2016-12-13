@@ -1,3 +1,3 @@
-function main(a){
-    a + 5;
+function println(a){
+    print(a, "\n");
 }
