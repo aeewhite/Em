@@ -9,13 +9,17 @@ package em;
  *
  *
  * Created by andrew on 9/24/16.
-        */
+ */
 public class Logger {
 
     private static int logLevel;
 
     public static void setLogLevel(int level){
         logLevel = level;
+    }
+
+    public static int getLogLevel() {
+        return logLevel;
     }
 
     private static void log(int level, String logMessage){

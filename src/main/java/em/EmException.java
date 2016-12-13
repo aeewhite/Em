@@ -28,6 +28,15 @@ public class EmException extends RuntimeException {
             Logger.error("ERROR: " + message);
         }
         //Throw fatal error
+        if(Logger.getLogLevel() > 0){
+            Logger.debug("--------------------------------------------");
+            Logger.debug("STACKTRACE");
+
+            StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+            for(int i = 2; i < stack.length; i++){
+                Logger.debug("\t at " + stack[i]);
+            }
+        }
         System.exit(1);
     }
 
