@@ -98,6 +98,7 @@ public class Runner {
     }
 
     private static void printHelp(int exitCode){
+        Logger.info("Em Interpreter v1.2.1");
         Logger.info("usage: emi filename");
         Logger.info("  options:");
         Logger.info("    -v\t\tEnable verbose logging, additional v's increase verbosity");
