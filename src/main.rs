@@ -1,5 +1,7 @@
 extern crate clap;
 use clap::{Arg, App};
+mod lexeme;
+use lexeme::LexemeType as LexemeType;
 
 fn main() {
 	// Setup the command line interface
@@ -19,7 +21,17 @@ fn main() {
 	if matches.occurrences_of("verbose") > 0 {
 		println!("verbosity level: {}", matches.occurrences_of("verbose"));
 	}
-	
+
+	let lex_type = LexemeType::VAR;
 
 	println!("Hello, world! lol");
+}
+
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test_eq() {
+        assert!(true);
+    }
 }
