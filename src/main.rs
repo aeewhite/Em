@@ -1,7 +1,7 @@
 extern crate clap;
 use clap::{Arg, App};
 mod lexeme;
-use lexeme::LexemeType as LexemeType;
+use lexeme::LexemeType;
 
 fn main() {
 	// Setup the command line interface
@@ -30,8 +30,8 @@ fn main() {
 
 #[cfg(test)]
 mod test {
-    #[test]
-    fn test_eq() {
-        assert!(true);
-    }
+	#[test]
+	fn test_eq() {
+		assert!(true);
+	}
 }
