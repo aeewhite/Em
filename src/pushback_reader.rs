@@ -125,6 +125,22 @@ mod test {
 		assert!(reader.read() == 't');
 		reader.pushback('t');
 		assert!(reader.read() == 't');
+		reader.pushback('s');
+		reader.pushback('t');
+		reader.pushback('u');
+		reader.pushback('f');
+		reader.pushback('f');
+		assert!(reader.read() == 's'); // Reading from the buffer
+		assert!(reader.read() == 't');
+		assert!(reader.read() == 'u');
+		assert!(reader.read() == 'f');
+		assert!(reader.read() == 'f');
+
+		assert!(reader.read() == 'e'); // Back to the original source
+		assert!(reader.read() == 's');
+		assert!(reader.read() == 't');
+		assert!(reader.read() == ' ');
+		assert!(reader.read() == '🐘');
 	}
 
 	#[test]
