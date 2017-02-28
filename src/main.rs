@@ -1,6 +1,8 @@
+#![feature(io)]
 extern crate clap;
 use clap::{Arg, App};
 mod lexeme;
+mod pushback_reader;
 use lexeme::LexemeType;
 
 fn main() {
@@ -18,11 +20,11 @@ fn main() {
 	
 	//Determining the verbosity
 	let verbosity: u64 = matches.occurrences_of("verbose");
-	if matches.occurrences_of("verbose") > 0 {
-		println!("verbosity level: {}", matches.occurrences_of("verbose"));
+	if verbosity > 0 {
+		println!("verbosity level: {}", verbosity);
 	}
 
-	let lex_type = LexemeType::VAR;
+	// let lex_type = LexemeType::VAR;
 
 	println!("Hello, world! lol");
 }
