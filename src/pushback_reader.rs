@@ -11,9 +11,8 @@ pub struct PushbackCharReader<T>{
 
 impl<T: Read> PushbackCharReader<T>{
 	fn new(src: T) -> PushbackCharReader<T>{
-		let mut iter = src.chars();
-		let mut buf = Vec::<char>::new();
-		let mut queue = VecDeque::<char>::with_capacity(10);
+		let iter = src.chars();
+		let queue = VecDeque::<char>::with_capacity(10);
 		return PushbackCharReader{source_iter: iter, 
 									line: 1, 
 									col: 1, 
@@ -69,8 +68,8 @@ mod test {
 
 	#[test]
 	fn test_read(){
-		let mut source = Cursor::new("test 🐘.");
-		let mut reader = PushbackCharReader::new(&mut source);
+		let source = Cursor::new("test 🐘.");
+		let mut reader = PushbackCharReader::new(source);
 		assert!(reader.read() == 't');
 		assert!(reader.read() == 'e');
 		assert!(reader.read() == 's');
@@ -82,8 +81,8 @@ mod test {
 
 	#[test]
 	fn test_col_inc(){
-		let mut source = Cursor::new("test 🐘");
-		let mut reader = PushbackCharReader::new(&mut source);
+		let source = Cursor::new("test 🐘");
+		let mut reader = PushbackCharReader::new(source);
 		reader.read();
 		reader.read();
 		assert!(reader.get_col() == 3);
@@ -93,8 +92,8 @@ mod test {
 
 	#[test]
 	fn test_line_inc(){
-		let mut source = Cursor::new("test \n🐘");
-		let mut reader = PushbackCharReader::new(&mut source);
+		let source = Cursor::new("test \n🐘");
+		let mut reader = PushbackCharReader::new(source);
 		reader.read(); // t
 		reader.read(); // e
 		reader.read(); // s
@@ -109,8 +108,8 @@ mod test {
 
 	#[test]
 	fn test_col_reset(){
-		let mut source = Cursor::new("a\nd");
-		let mut reader = PushbackCharReader::new(&mut source);
+		let source = Cursor::new("a\nd");
+		let mut reader = PushbackCharReader::new(source);
 		reader.read();
 		reader.read();
 		assert!(reader.get_line() == 2);
@@ -120,8 +119,8 @@ mod test {
 
 	#[test]
 	fn test_pushback(){
-		let mut source = Cursor::new("test 🐘");
-		let mut reader = PushbackCharReader::new(&mut source);
+		let source = Cursor::new("test 🐘");
+		let mut reader = PushbackCharReader::new(source);
 		assert!(reader.read() == 't');
 		reader.pushback('t');
 		assert!(reader.read() == 't');
@@ -146,8 +145,8 @@ mod test {
 	#[test]
 	#[should_panic(expected = "buffer is full")]
 	fn test_pushback_overflow(){
-		let mut source = Cursor::new("test 🐘");
-		let mut reader = PushbackCharReader::new(&mut source);
+		let source = Cursor::new("test 🐘");
+		let mut reader = PushbackCharReader::new(source);
 		loop {
 			reader.pushback('a');
 		}
