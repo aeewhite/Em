@@ -3,17 +3,20 @@ use std::io::Chars;
 use std::collections::vec_deque::VecDeque;
 
 pub struct PushbackCharReader<T>{
+	source: T,
 	source_iter: Chars<T>,
 	line: u32,
 	col: u32,
 	buffer: VecDeque<char>
 }
 
-impl<T: Read> PushbackCharReader<T>{
+impl<T: Read + Clone> PushbackCharReader<T>{
 	fn new(src: T) -> PushbackCharReader<T>{
+		let source_clone = src.clone();
 		let iter = src.chars();
 		let queue = VecDeque::<char>::with_capacity(10);
-		return PushbackCharReader{source_iter: iter, 
+		return PushbackCharReader{source: source_clone,
+									source_iter: iter, 
 									line: 1, 
 									col: 1, 
 									buffer: queue};
@@ -140,6 +143,17 @@ mod test {
 		assert!(reader.read() == 't');
 		assert!(reader.read() == ' ');
 		assert!(reader.read() == '🐘');
+	}
+
+	#[test]
+	fn test_read_from_source_again(){
+		let source = Cursor::new("test 🐘.");
+		let mut reader = PushbackCharReader::new(source);
+		assert!(reader.read() == 't');
+		assert!(reader.read() == 'e');
+		let mut string: String = "".to_string();
+		reader.source.read_to_string(&mut string).unwrap();
+		assert!(string == "test 🐘.");
 	}
 
 	#[test]
