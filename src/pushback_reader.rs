@@ -151,7 +151,7 @@ mod test {
 		let mut reader = PushbackCharReader::new(source);
 		assert!(reader.read() == 't');
 		assert!(reader.read() == 'e');
-		let mut string: String = "".to_string();
+		let mut string: String = String::new();
 		reader.source.read_to_string(&mut string).unwrap();
 		assert!(string == "test 🐘.");
 	}
