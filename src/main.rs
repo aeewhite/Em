@@ -3,6 +3,7 @@ extern crate clap;
 use clap::{Arg, App};
 mod lexeme_type;
 mod lexeme;
+mod lexer;
 mod pushback_reader;
 
 fn main() {
