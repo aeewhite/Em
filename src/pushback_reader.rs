@@ -11,7 +11,7 @@ pub struct PushbackCharReader<T>{
 }
 
 impl<T: Read + Clone> PushbackCharReader<T>{
-	fn new(src: T) -> PushbackCharReader<T>{
+	pub fn new(src: T) -> PushbackCharReader<T>{
 		let source_clone = src.clone();
 		let iter = src.chars();
 		let queue = VecDeque::<char>::with_capacity(10);
@@ -22,7 +22,7 @@ impl<T: Read + Clone> PushbackCharReader<T>{
 									buffer: queue};
 	}
 
-	fn pushback(&mut self, c: char){
+	pub fn pushback(&mut self, c: char){
 		if self.buffer.len() < self.buffer.capacity(){
 			self.buffer.push_back(c);
 		}
@@ -31,7 +31,8 @@ impl<T: Read + Clone> PushbackCharReader<T>{
 		}
 	}
 
-	fn read(&mut self) -> char{
+	//TODO: Make this an option for greater safety
+	pub fn read(&mut self) -> char{
 		let c;
 		if !self.buffer.is_empty() {
 			c = self.buffer.pop_front().unwrap();
@@ -49,12 +50,33 @@ impl<T: Read + Clone> PushbackCharReader<T>{
 		return c;
 	}
 
-	fn get_line(&self) -> u32{
+	pub fn get_line(&self) -> u32{
 		return self.line;
 	}
 
-	fn get_col(&self) -> u32{
+	pub fn get_col(&self) -> u32{
 		return self.col;
+	}
+
+	pub fn skip_whitespace(&mut self){
+		let c = self.read();
+		if c.is_whitespace(){
+			self.skip_whitespace()
+		}
+		else if c == '#'{
+			self.skip_line();
+			self.skip_whitespace()
+		}
+		else{
+			self.pushback(c)
+		}
+	}
+
+	fn skip_line(&mut self){
+		let mut c = self.read();
+		while c != '\n' {
+			c = self.read();
+		}
 	}
 }
 
