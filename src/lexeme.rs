@@ -9,15 +9,27 @@ pub struct Lexeme<S> {
     source: Rc<RefCell<S>>,
     lex_type: LexemeType,
     left_child: Option<Box<Lexeme<S>>>,
-    right_child: Option<Box<Lexeme<S>>>
+    right_child: Option<Box<Lexeme<S>>>,
+    line: u32,
+    col: u32
 }
 
 impl<S: Read+Seek> Lexeme<S>{
-    fn new(src: Rc<RefCell<S>>, t: LexemeType ) -> Lexeme<S>{
+    pub fn new(src: Rc<RefCell<S>>, t: LexemeType, l: u32, c: u32) -> Lexeme<S>{
         return Lexeme{source: src.clone(),
                         lex_type: t,
                         left_child: None,
-                        right_child: None}
+                        right_child: None,
+                        line: l,
+                        col: c}
+    }
+    fn new_without_position(src: Rc<RefCell<S>>, t: LexemeType ) -> Lexeme<S>{
+        return Lexeme{source: src.clone(),
+                        lex_type: t,
+                        left_child: None,
+                        right_child: None,
+                        line: 0,
+                        col: 0}
     }
 
     fn set_left(&mut self, l: Lexeme<S>){
@@ -76,28 +88,28 @@ mod test{
     #[test]
     fn test_create(){
         let source = Rc::new(RefCell::new(Cursor::new("test 🐘.")));
-        Lexeme::new(source, LexemeType::STRING("letter".to_string()));
+        Lexeme::new_without_position(source, LexemeType::STRING("letter".to_string()));
     }
 
     #[test]
     fn test_create_with_left_child(){
         let source = Rc::new(RefCell::new(Cursor::new("test 🐘.")));
-        let mut root = Lexeme::new(source.clone(), LexemeType::STRING("letter".to_string()));
-        root.set_left(Lexeme::new(source, LexemeType::STRING("left".to_string())));
+        let mut root = Lexeme::new_without_position(source.clone(), LexemeType::STRING("letter".to_string()));
+        root.set_left(Lexeme::new_without_position(source, LexemeType::STRING("left".to_string())));
     }
 
     #[test]
     fn test_create_with_right_child(){
         let source = Rc::new(RefCell::new(Cursor::new("test 🐘.")));
-        let mut root = Lexeme::new(source.clone(), LexemeType::STRING("letter".to_string()));
-        root.set_right(Lexeme::new(source, LexemeType::STRING("right".to_string())));
+        let mut root = Lexeme::new_without_position(source.clone(), LexemeType::STRING("letter".to_string()));
+        root.set_right(Lexeme::new_without_position(source, LexemeType::STRING("right".to_string())));
     }
 
     #[test]
     fn test_get_left_child(){
         let source = Rc::new(RefCell::new(Cursor::new("test 🐘.")));
-        let mut root = Lexeme::new(source.clone(), LexemeType::STRING("letter".to_string()));
-        root.set_left(Lexeme::new(source.clone(), LexemeType::STRING("left".to_string())));
+        let mut root = Lexeme::new_without_position(source.clone(), LexemeType::STRING("letter".to_string()));
+        root.set_left(Lexeme::new_without_position(source.clone(), LexemeType::STRING("left".to_string())));
 
         let l = root.get_left();
         match l.unwrap().get_type() {
@@ -131,7 +143,7 @@ mod test{
         let source = Rc::new(RefCell::new(Cursor::new("test 🐘.")));
         
         // Create a lexeme from that source
-        let root = Lexeme::new(source.clone(), LexemeType::STRING("letter".to_string()));
+        let root = Lexeme::new_without_position(source.clone(), LexemeType::STRING("letter".to_string()));
         let mut orig = String::new();
         let o_size = source.borrow_mut().read_to_string(&mut orig).unwrap();
 
@@ -149,9 +161,9 @@ mod test{
     #[test]
     fn test_lexeme_chain(){
         let source = Rc::new(RefCell::new(Cursor::new("test 🐘.")));
-        let mut root = Lexeme::new(source.clone(), LexemeType::FUNCTION);
-        let mut right = Lexeme::new(source.clone(), LexemeType::VAR);
-        let left = Lexeme::new(source.clone(), LexemeType::IF);
+        let mut root = Lexeme::new_without_position(source.clone(), LexemeType::FUNCTION);
+        let mut right = Lexeme::new_without_position(source.clone(), LexemeType::VAR);
+        let left = Lexeme::new_without_position(source.clone(), LexemeType::IF);
 
         right.set_left(left);
         root.set_right(right);
@@ -179,7 +191,7 @@ mod test{
     #[test]
     fn test_get_nonexistant_child(){
         let source = Rc::new(RefCell::new(Cursor::new("test 🐘.")));
-        let mut root = Lexeme::new(source.clone(), LexemeType::FUNCTION);
+        let mut root = Lexeme::new_without_position(source.clone(), LexemeType::FUNCTION);
 
         assert!(root.get_left().is_none());
         assert!(root.get_right().is_none());
