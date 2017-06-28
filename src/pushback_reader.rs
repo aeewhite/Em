@@ -23,6 +23,12 @@ impl<T: Read + Clone> PushbackCharReader<T>{
 	}
 
 	pub fn pushback(&mut self, c: char){
+		if c == '\n'{
+			self.line -= 1;
+		}
+		else{
+			self.col -= 1;
+		}
 		if self.buffer.len() < self.buffer.capacity(){
 			self.buffer.push_back(c);
 		}
@@ -31,8 +37,8 @@ impl<T: Read + Clone> PushbackCharReader<T>{
 		}
 	}
 
-	//TODO: Make this an option for greater safety
 	pub fn read(&mut self) -> Option<char>{
+		println!("Col = {:?}", self.col);
 		let c;
 		if !self.buffer.is_empty() {
 			c = self.buffer.pop_front();
@@ -154,18 +160,9 @@ mod test {
 		assert!(reader.read().unwrap() == 't');
 		reader.pushback('t');
 		assert!(reader.read().unwrap() == 't');
-		reader.pushback('s');
-		reader.pushback('t');
-		reader.pushback('u');
-		reader.pushback('f');
-		reader.pushback('f');
-		assert!(reader.read().unwrap() == 's'); // Reading from the buffer
-		assert!(reader.read().unwrap() == 't');
-		assert!(reader.read().unwrap() == 'u');
-		assert!(reader.read().unwrap() == 'f');
-		assert!(reader.read().unwrap() == 'f');
-
 		assert!(reader.read().unwrap() == 'e'); // Back to the original source
+		assert!(reader.read().unwrap() == 's');
+		reader.pushback('s');
 		assert!(reader.read().unwrap() == 's');
 		assert!(reader.read().unwrap() == 't');
 		assert!(reader.read().unwrap() == ' ');
@@ -186,8 +183,11 @@ mod test {
 	#[test]
 	#[should_panic(expected = "buffer is full")]
 	fn test_pushback_overflow(){
-		let source = Cursor::new("test 🐘");
+		let source = Cursor::new("aaaaaaaaaaaaaaaaaaaaaaaaa");
 		let mut reader = PushbackCharReader::new(source);
+		for _ in 0..15 {
+		    reader.read();
+		}
 		loop {
 			reader.pushback('a');
 		}
