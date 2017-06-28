@@ -71,33 +71,36 @@ impl <S: Read+Seek+Clone> Lexer<S>{
 
 		match c {
 			'+' => {
-				let test = self.reader.read().unwrap();
+				let test = self.reader.read();
 				match test {
-					'+' => Some(Lexeme::new(s_clone, LexemeType::INCREMENT, row, col)),
-					_ => {
-						self.reader.pushback(test); 
-						Some(Lexeme::new(s_clone, LexemeType::INCREMENT, row, col))
-					}
+					Some(t) if t =='+' => Some(Lexeme::new(s_clone, LexemeType::INCREMENT, row, col)),
+					Some(t) => {
+						self.reader.pushback(t); 
+						Some(Lexeme::new(s_clone, LexemeType::PLUS, row, col))
+					},
+					None => None
 				}
 			},
 			'-' => {
-				let test = self.reader.read().unwrap();
+				let test = self.reader.read();
 				match test {
-					'-' => Some(Lexeme::new(s_clone, LexemeType::DECREMENT, row, col)),
-					'>' => Some(Lexeme::new(s_clone, LexemeType::ARROW, row, col)),
-					_ => {
-						if test.is_numeric() {
-							println!("Test = {:?}, c = {:?}", test, c );
+					Some(t) if t == '-' => Some(Lexeme::new(s_clone, LexemeType::DECREMENT, row, col)),
+					Some(t) if t == '>' => Some(Lexeme::new(s_clone, LexemeType::ARROW, row, col)),
+					Some(t) => {
+						if t.is_numeric() {
+							println!("Test = {:?}, c = {:?}", t, c );
 							//negative numbers
 							self.reader.pushback(c);
-							self.reader.pushback(test);
+							self.reader.pushback(t);
 							self.lex_number()
 						}
 						else {
-							self.reader.pushback(test);
+							println!("Not numeric");
+							self.reader.pushback(t);
 							Some(Lexeme::new(s_clone, LexemeType::MINUS, row, col))
 						}
-					}
+					},
+					None => Some(Lexeme::new(s_clone, LexemeType::MINUS, row, col))
 				}
 			},
 			'/' => {
@@ -342,6 +345,36 @@ mod test {
 	fn lex_negative_integer_test(){
 		let mut lexer = Lexer::new(Cursor::new("-5"));
 		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::INTEGER(-5));
+	}
+
+	#[test]
+	fn lex_boolean_test(){
+		let mut lexer = Lexer::new(Cursor::new("true false"));
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::TRUE);
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::FALSE);
+	}
+
+	#[test]
+	fn lex_math_symbols_test(){
+		let mut lexer = Lexer::new(Cursor::new("* / + -"));
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::MULTIPLY);
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::DIVIDE);
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::PLUS);
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::MINUS);
+	}
+
+	#[test]
+	fn lex_negation_test(){
+		let mut lexer = Lexer::new(Cursor::new("!true"));
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::NOT);
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::TRUE);
+	}
+
+	#[test]
+	fn lex_boolean_ops_test(){
+		let mut lexer = Lexer::new(Cursor::new("&& ||"));
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::AND);
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::OR);
 	}
 
 	#[test]
