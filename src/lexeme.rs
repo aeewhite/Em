@@ -5,6 +5,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use lexeme_type::LexemeType;
 
+#[derive(Debug)]
 pub struct Lexeme<S> {
     source: Rc<RefCell<S>>,
     lex_type: LexemeType,
@@ -54,7 +55,7 @@ impl<S: Read+Seek> Lexeme<S>{
         }
     }
 
-    fn get_type(&mut self)->LexemeType{
+    pub fn get_type(&mut self)->LexemeType{
         self.lex_type.clone()
     }
 

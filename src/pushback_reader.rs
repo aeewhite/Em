@@ -32,15 +32,20 @@ impl<T: Read + Clone> PushbackCharReader<T>{
 	}
 
 	//TODO: Make this an option for greater safety
-	pub fn read(&mut self) -> char{
+	pub fn read(&mut self) -> Option<char>{
 		let c;
 		if !self.buffer.is_empty() {
-			c = self.buffer.pop_front().unwrap();
+			c = self.buffer.pop_front();
 		}
 		else{
-			c = self.source_iter.next().unwrap().unwrap();
+			if let Some(res) = self.source_iter.next(){
+				c = res.ok();
+			}
+			else{
+				c = None
+			}
 		}
-		if c == '\n' {
+		if c.is_some() && c.unwrap() == '\n' {
 			self.line += 1;
 			self.col = 1;
 		}
@@ -59,23 +64,23 @@ impl<T: Read + Clone> PushbackCharReader<T>{
 	}
 
 	pub fn skip_whitespace(&mut self){
-		let c = self.read();
-		if c.is_whitespace(){
-			self.skip_whitespace()
-		}
-		else if c == '#'{
-			self.skip_line();
-			self.skip_whitespace()
-		}
-		else{
-			self.pushback(c)
+		if let Some(c) = self.read(){
+			if c.is_whitespace(){
+				self.skip_whitespace()
+			}
+			else if c == '#'{
+				self.skip_line();
+				self.skip_whitespace()
+			}
+			else{
+				self.pushback(c)
+			}	
 		}
 	}
 
-	fn skip_line(&mut self){
-		let mut c = self.read();
-		while c != '\n' {
-			c = self.read();
+	pub fn skip_line(&mut self){
+		while let Some(c) = self.read(){
+			if c == '\n' { break; }
 		}
 	}
 }
@@ -95,23 +100,23 @@ mod test {
 	fn test_read(){
 		let source = Cursor::new("test 🐘.");
 		let mut reader = PushbackCharReader::new(source);
-		assert!(reader.read() == 't');
-		assert!(reader.read() == 'e');
-		assert!(reader.read() == 's');
-		assert!(reader.read() == 't');
-		assert!(reader.read() == ' ');
-		assert!(reader.read() == '🐘');
-		assert!(reader.read() == '.');
+		assert!(reader.read().unwrap() == 't');
+		assert!(reader.read().unwrap() == 'e');
+		assert!(reader.read().unwrap() == 's');
+		assert!(reader.read().unwrap() == 't');
+		assert!(reader.read().unwrap() == ' ');
+		assert!(reader.read().unwrap() == '🐘');
+		assert!(reader.read().unwrap() == '.');
 	}
 
 	#[test]
 	fn test_col_inc(){
 		let source = Cursor::new("test 🐘");
 		let mut reader = PushbackCharReader::new(source);
-		reader.read();
-		reader.read();
+		reader.read().unwrap();
+		reader.read().unwrap();
 		assert!(reader.get_col() == 3);
-		reader.read();
+		reader.read().unwrap();
 		assert!(reader.get_col() == 4);
 	}
 
@@ -119,15 +124,15 @@ mod test {
 	fn test_line_inc(){
 		let source = Cursor::new("test \n🐘");
 		let mut reader = PushbackCharReader::new(source);
-		reader.read(); // t
-		reader.read(); // e
-		reader.read(); // s
+		reader.read().unwrap(); // t
+		reader.read().unwrap(); // e
+		reader.read().unwrap(); // s
 		assert!(reader.get_line() == 1);
-		reader.read(); // t
-		reader.read(); // {space}
-		reader.read(); // {newline}
+		reader.read().unwrap(); // t
+		reader.read().unwrap(); // {space}
+		reader.read().unwrap(); // {newline}
 		assert!(reader.get_line() == 2);
-		reader.read(); // 🐘
+		reader.read().unwrap(); // 🐘
 		assert!(reader.get_line() == 2);
 	}
 
@@ -135,44 +140,44 @@ mod test {
 	fn test_col_reset(){
 		let source = Cursor::new("a\nd");
 		let mut reader = PushbackCharReader::new(source);
-		reader.read();
-		reader.read();
+		reader.read().unwrap();
+		reader.read().unwrap();
 		assert!(reader.get_line() == 2);
 		assert!(reader.get_col() == 1);
-		reader.read();
+		reader.read().unwrap();
 	}
 
 	#[test]
 	fn test_pushback(){
 		let source = Cursor::new("test 🐘");
 		let mut reader = PushbackCharReader::new(source);
-		assert!(reader.read() == 't');
+		assert!(reader.read().unwrap() == 't');
 		reader.pushback('t');
-		assert!(reader.read() == 't');
+		assert!(reader.read().unwrap() == 't');
 		reader.pushback('s');
 		reader.pushback('t');
 		reader.pushback('u');
 		reader.pushback('f');
 		reader.pushback('f');
-		assert!(reader.read() == 's'); // Reading from the buffer
-		assert!(reader.read() == 't');
-		assert!(reader.read() == 'u');
-		assert!(reader.read() == 'f');
-		assert!(reader.read() == 'f');
+		assert!(reader.read().unwrap() == 's'); // Reading from the buffer
+		assert!(reader.read().unwrap() == 't');
+		assert!(reader.read().unwrap() == 'u');
+		assert!(reader.read().unwrap() == 'f');
+		assert!(reader.read().unwrap() == 'f');
 
-		assert!(reader.read() == 'e'); // Back to the original source
-		assert!(reader.read() == 's');
-		assert!(reader.read() == 't');
-		assert!(reader.read() == ' ');
-		assert!(reader.read() == '🐘');
+		assert!(reader.read().unwrap() == 'e'); // Back to the original source
+		assert!(reader.read().unwrap() == 's');
+		assert!(reader.read().unwrap() == 't');
+		assert!(reader.read().unwrap() == ' ');
+		assert!(reader.read().unwrap() == '🐘');
 	}
 
 	#[test]
 	fn test_read_from_source_again(){
 		let source = Cursor::new("test 🐘.");
 		let mut reader = PushbackCharReader::new(source);
-		assert!(reader.read() == 't');
-		assert!(reader.read() == 'e');
+		assert!(reader.read().unwrap() == 't');
+		assert!(reader.read().unwrap() == 'e');
 		let mut string: String = String::new();
 		reader.source.read_to_string(&mut string).unwrap();
 		assert!(string == "test 🐘.");
