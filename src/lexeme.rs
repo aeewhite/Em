@@ -1,5 +1,6 @@
 use std::io::Read;
 use std::io::Seek;
+use std::io::SeekFrom;
 use std::rc::Rc;
 use std::cell::RefCell;
 use lexeme_type::LexemeType;
@@ -76,7 +77,6 @@ impl<S: Read+Seek> Lexeme<S>{
 mod test{
     use super::*;
     use std::io::Cursor;
-    use std::io::SeekFrom;
 
 
     #[test]

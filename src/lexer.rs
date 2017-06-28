@@ -355,11 +355,12 @@ mod test {
 
 	#[test]
 	fn lex_math_symbols_test(){
-		let mut lexer = Lexer::new(Cursor::new("* / + -"));
+		let mut lexer = Lexer::new(Cursor::new("* / + - %"));
 		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::MULTIPLY);
 		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::DIVIDE);
 		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::PLUS);
 		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::MINUS);
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::MODULO);
 	}
 
 	#[test]
