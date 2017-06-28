@@ -1,6 +1,5 @@
 use std::io::Read;
 use std::io::Seek;
-use std::io::SeekFrom;
 use std::rc::Rc;
 use std::cell::RefCell;
 use lexeme_type::LexemeType;
@@ -11,8 +10,8 @@ pub struct Lexeme<S> {
     lex_type: LexemeType,
     left_child: Option<Box<Lexeme<S>>>,
     right_child: Option<Box<Lexeme<S>>>,
-    line: u32,
-    col: u32
+    pub line: u32,
+    pub col: u32
 }
 
 impl<S: Read+Seek> Lexeme<S>{
@@ -62,6 +61,14 @@ impl<S: Read+Seek> Lexeme<S>{
     fn get_source(&self)->Rc<RefCell<S>>{
         self.source.clone()
     }
+
+    pub fn get_line(&self)->u32{
+        self.line
+    }
+
+    pub fn get_col(&self)->u32{
+        self.col
+    }
 }
 
 
@@ -69,6 +76,7 @@ impl<S: Read+Seek> Lexeme<S>{
 mod test{
     use super::*;
     use std::io::Cursor;
+    use std::io::SeekFrom;
 
 
     #[test]

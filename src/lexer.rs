@@ -4,7 +4,6 @@ use pushback_reader::PushbackCharReader;
 use std::cell::RefCell;
 use std::io::Read;
 use std::io::Seek;
-use std::io::SeekFrom;
 use std::rc::Rc;
 
 pub struct Lexer<S>{
@@ -25,8 +24,8 @@ impl <S: Read+Seek+Clone> Lexer<S>{
 		self.reader.skip_whitespace();
 
 		//Get our character ready
-		let row = self.reader.get_line(); //TODO: check if these should be
-		let col = self.reader.get_col();  //before or after read
+		let row = self.reader.get_line();
+		let col = self.reader.get_col();
 		let character = self.reader.read();
 		
 		let s_clone = self.source.clone();
@@ -378,9 +377,32 @@ mod test {
 	}
 
 	#[test]
+	fn lex_assign_equality_test(){
+		let mut lexer = Lexer::new(Cursor::new("a==b a=b"));
+		lexer.lex();
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::EQUALITY);
+		lexer.lex();
+		lexer.lex();
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::ASSIGN);
+	}
+
+	#[test]
 	fn lex_negative_multi_integer_test(){
 		let mut lexer = Lexer::new(Cursor::new("-55"));
 		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::INTEGER(-55));
+	}
+
+	#[test]
+	fn lex_line_col_check_test(){
+		let mut lexer = Lexer::new(Cursor::new("true false"));
+		if let Some(t) = lexer.lex(){
+			assert_eq!(t.get_col(), 1);
+			assert_eq!(t.get_line(), 1);
+		}
+		if let Some(f) = lexer.lex(){
+			assert_eq!(f.get_col(), 6);
+			assert_eq!(f.get_line(), 1);
+		}
 	}
 
 	#[test]
