@@ -1,3 +1,4 @@
+sudo: false
 language: rust
 rust:
   - beta
@@ -16,7 +17,7 @@ before_script:
 script:
   - |
       travis-cargo build &&
-      travis-cargo test &&
+      travis-cargo test
 after_success:
   # measure code coverage and upload to coveralls.io (the verify
   # argument mitigates kcov crashes due to malformed debuginfo, at the
