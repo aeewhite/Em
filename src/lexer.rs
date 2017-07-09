@@ -206,7 +206,11 @@ impl <S: Read+Seek+Clone> Lexer<S>{
 			let character = self.reader.read();
 			if let Some(c) = character{
 				println!("loop c is {}", c );
-				if !c.is_numeric() { 
+				if c == '_' {
+					println!("Skipping an _");
+					continue;
+				}
+				else if !c.is_numeric() { 
 					self.reader.pushback(c);
 					break;
 				}
@@ -391,6 +395,24 @@ mod test {
 	fn lex_negative_multi_integer_test(){
 		let mut lexer = Lexer::new(Cursor::new("-55"));
 		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::INTEGER(-55));
+	}
+
+	#[test]
+	fn lex_underscores_in_number_test(){
+		let mut lexer = Lexer::new(Cursor::new("1_000"));
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::INTEGER(1000));
+	}
+
+	#[test]
+	fn lex_negative_underscores_in_number_test(){
+		let mut lexer = Lexer::new(Cursor::new("-1_000"));
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::INTEGER(-1000));
+	}
+
+	#[test]
+	fn lex_lots_of_underscores_in_number_test(){
+		let mut lexer = Lexer::new(Cursor::new("1_000_000_000"));
+		assert_eq!(lexer.lex().unwrap().get_type(), LexemeType::INTEGER(1000000000));
 	}
 
 	#[test]
