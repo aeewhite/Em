@@ -1,7 +1,6 @@
 sudo: false
 language: rust
 rust:
-  - beta
   - nightly
 addons:
   apt:
@@ -15,9 +14,7 @@ before_script:
       pip install 'travis-cargo<0.2' --user &&
       export PATH=$HOME/.local/bin:$PATH
 script:
-  - |
-      travis-cargo build &&
-      travis-cargo test
+  - travis-cargo build && travis-cargo test
 after_success:
   # measure code coverage and upload to coveralls.io (the verify
   # argument mitigates kcov crashes due to malformed debuginfo, at the
